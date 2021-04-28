@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import it.polito.tdp.poweroutages.model.IdentityMap;
 import it.polito.tdp.poweroutages.model.Nerc;
 import it.polito.tdp.poweroutages.model.PowerOutage;
 
@@ -44,7 +43,7 @@ public class PowerOutageDAO
 		return nercs;
 	}
 
-	public List<PowerOutage> getPowerOutagesOf(Nerc selectedNerc, IdentityMap idMap)
+	public List<PowerOutage> getPowerOutagesOf(Nerc selectedNerc)
 	{
 		String sqlQuery = String.format("%s %s %s %s",
 								"SELECT id, nerc_id, customers_affected, date_event_began, date_event_finished",
@@ -64,12 +63,11 @@ public class PowerOutageDAO
 			while(result.next())
 			{
 				int powerOutageId = result.getInt("id");
-				Nerc nerc = idMap.getNerc(result.getInt("nerc_id"));
 				int custAffected = result.getInt("customers_affected");
 				LocalDateTime dateTimeBegin = result.getTimestamp("date_event_began").toLocalDateTime();
 				LocalDateTime dateTimeFinished = result.getTimestamp("date_event_finished").toLocalDateTime();
 				
-				PowerOutage newPowerOutage = new PowerOutage(powerOutageId, nerc, custAffected, dateTimeBegin, dateTimeFinished);
+				PowerOutage newPowerOutage = new PowerOutage(powerOutageId, selectedNerc, custAffected, dateTimeBegin, dateTimeFinished);
 				powerOutages.add(newPowerOutage);
 			}
 			

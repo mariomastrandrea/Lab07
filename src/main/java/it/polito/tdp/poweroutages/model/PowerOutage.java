@@ -1,6 +1,8 @@
 package it.polito.tdp.poweroutages.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PowerOutage
 {
@@ -45,6 +47,21 @@ public class PowerOutage
 	{
 		return this.dateEventFinished;
 	}
+	
+	public long getHours()
+	{
+		return Duration.between(dateEventBegan, dateEventFinished).toHours();
+	}
+	
+	public int getMinutes()
+	{
+		return Duration.between(dateEventBegan, dateEventFinished).toMinutesPart();
+	}
+	
+	public int getYear()
+	{
+		return this.dateEventBegan.getYear();
+	}
 
 	@Override
 	public int hashCode()
@@ -68,6 +85,23 @@ public class PowerOutage
 		if (id != other.id)
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return String.format("P%d", this.id);
+	}
+	
+	public String toFormattedString()
+	{
+		String eventBegan = this.dateEventBegan.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+		String eventFinished = this.dateEventFinished.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+		
+		return String.format("%-5d %-5d %-20s %-20s %-4d %-4d %-8d", this.id, this.getYear(), 
+																eventBegan, eventFinished, 
+																this.getHours(), this.getMinutes(),
+																this.getCustomersAffected());
 	}
 	
 }

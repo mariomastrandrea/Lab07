@@ -47,7 +47,6 @@ public class FXMLController
     @FXML
     void doWorstCaseAnalysis(ActionEvent event) 
     {    	
-    	//TODO: implement method
     	Nerc selectedNerc = this.NercComboBox.getValue();
     	String maxHoursInput = this.maxHoursTextField.getText();
     	String maxYearsInput = this.maxYearsTextField.getText();
@@ -67,28 +66,42 @@ public class FXMLController
 			return;
 		}
     	
-    	List<PowerOutage> powerOutages = this.model.computeWorstCase(selectedNerc, maxYears, maxHours);
+    	List<PowerOutage> worstCasePowerOutages = this.model.computeWorstCase(selectedNerc, maxYears, maxHours);
     	
-    	if(powerOutages.isEmpty())
+    	if(worstCasePowerOutages.isEmpty())
     	{
     		this.resultTextArea.setText(NO_RESULT_FOUND_ERROR);
     		return;
     	}
     	
-    	this.printPowerOutages(powerOutages);
+    	int totPeopleAffected = this.model.totalCustomersAffected(worstCasePowerOutages);
+    	long totalHoursOfOutage = this.model.totHoursAffected(worstCasePowerOutages);
+    	
+    	StringBuilder output = new StringBuilder();
+    	output.append("Total people affected: ").append(totPeopleAffected).append("\n");
+    	output.append("Total hours of outage: ").append(totalHoursOfOutage).append("\n\n");
+    	output.append(String.format("   %-5s %-5s %-20s %-20s %-4s %-4s %-8s\n",
+    						"id", "year", "event begin", "event finished", "hs", "min", "people"));
+    	output.append(this.printPowerOutages(worstCasePowerOutages));
+    	
+    	this.resultTextArea.setText(output.toString());
     }
     
     private String printPowerOutages(Collection<PowerOutage> powerOutages)
     {
     	StringBuilder sb = new StringBuilder();
+    	int count = 0;
     	
     	for(PowerOutage po : powerOutages)
     	{
+    		count++;
+    		
     		if(sb.length() > 0)
     			sb.append("\n");
     		
-    		sb.append(po.toString());
+    		sb.append(count).append(") ").append(po.toFormattedString());
     	}
+    	
     	return sb.toString();
     }
 
@@ -165,12 +178,12 @@ public class FXMLController
         	return change;
         }));
         
-        this.maxHoursTextField.setTextFormatter(new TextFormatter<>(change -> 
+        this.maxHoursTextField.setTextFormatter(new TextFormatter<Double>(change -> 
         {
         	if(this.maxHoursTextField.getText().length() >= 5)
         		change.setText("");
         	else
-        	{
+        	{        		
 	        	String text = change.getText();
 	        	
 	        	if(text.length() > 5)
