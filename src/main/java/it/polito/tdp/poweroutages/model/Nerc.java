@@ -1,34 +1,30 @@
 package it.polito.tdp.poweroutages.model;
 
-public class Nerc {
+public class Nerc 
+{	
+	private final int id;
+	private final String value;
 
 	
-	private int id;
-	private String value;
-
-	public Nerc(int id, String value) {
+	public Nerc(int id, String value) 
+	{
 		this.id = id;
 		this.value = value;
 	}
 
-	public int getId() {
+	public int getId() 
+	{
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getValue() {
+	public String getValue() 
+	{
 		return value;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
-	}
-
 	@Override
-	public int hashCode() {
+	public int hashCode() 
+	{
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + id;
@@ -36,7 +32,8 @@ public class Nerc {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) 
+	{
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -50,10 +47,9 @@ public class Nerc {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(value);
-		return builder.toString();
+	public String toString() 
+	{
+		return this.value;
 	}
 	
 

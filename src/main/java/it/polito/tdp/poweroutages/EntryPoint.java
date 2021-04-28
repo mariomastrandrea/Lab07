@@ -1,36 +1,32 @@
 package it.polito.tdp.poweroutages;
 
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 
-import it.polito.tdp.poweroutages.FXMLController;
-import it.polito.tdp.poweroutages.model.Model;
+import it.polito.tdp.poweroutages.model.PowerOutagesModel;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
-public class EntryPoint extends Application {
-
+public class EntryPoint extends Application 
+{
     @Override
-    public void start(Stage stage) throws Exception {
-    	
-    	FXMLController controller;
-    	
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene.fxml"));
+    public void start(Stage stage) throws Exception 
+    {	    	
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Scene_lab07.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("/styles/Styles.css");
 
-        controller = loader.getController();
-    	
+        FXMLController controller = loader.getController();
         // TODO impostare il model nel controller   
-        Model model = new Model();
+        PowerOutagesModel model = new PowerOutagesModel();
         controller.setModel(model);
                 
-        
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("Lab07 - Power outages");
         stage.setScene(scene);
+        stage.setResizable(false);
         stage.show();
     }
 
@@ -42,7 +38,8 @@ public class EntryPoint extends Application {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) 
+    {
         launch(args);
     }
 

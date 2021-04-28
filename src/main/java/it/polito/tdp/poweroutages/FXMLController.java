@@ -1,58 +1,195 @@
-/**
- * Sample Skeleton for 'Scene.fxml' Controller Class
- */
 
 package it.polito.tdp.poweroutages;
 
 import java.net.URL;
+import java.util.Collection;
+import java.util.List;
 import java.util.ResourceBundle;
-import it.polito.tdp.poweroutages.model.Model;
+
+import it.polito.tdp.poweroutages.model.PowerOutagesModel;
 import it.polito.tdp.poweroutages.model.Nerc;
+import it.polito.tdp.poweroutages.model.PowerOutage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.input.KeyEvent;
 
-public class FXMLController {
-
-    @FXML // ResourceBundle that was given to the FXMLLoader
+public class FXMLController 
+{
+    @FXML
     private ResourceBundle resources;
 
-    @FXML // URL location of the FXML file that was given to the FXMLLoader
+    @FXML
     private URL location;
 
-    @FXML // fx:id="cmbNerc"
-    private ComboBox<Nerc> cmbNerc; // Value injected by FXMLLoader
-
-    @FXML // fx:id="txtYears"
-    private TextField txtYears; // Value injected by FXMLLoader
-
-    @FXML // fx:id="txtHours"
-    private TextField txtHours; // Value injected by FXMLLoader
-
-    @FXML // fx:id="txtResult"
-    private TextArea txtResult; // Value injected by FXMLLoader
-
-    private Model model;
-    
     @FXML
-    void doRun(ActionEvent event) {
-    	txtResult.clear();
-    }
+    private ComboBox<Nerc> NercComboBox;
 
-    @FXML // This method is called by the FXMLLoader when initialization is complete
-    void initialize() {
-        assert cmbNerc != null : "fx:id=\"cmbNerc\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert txtYears != null : "fx:id=\"txtYears\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert txtHours != null : "fx:id=\"txtHours\" was not injected: check your FXML file 'Scene.fxml'.";
-        assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Scene.fxml'.";
-        
-        // Utilizzare questo font per incolonnare correttamente i dati;
-        txtResult.setStyle("-fx-font-family: monospace");
+    @FXML
+    private TextField maxYearsTextField;
+
+    @FXML
+    private TextField maxHoursTextField;
+
+    @FXML
+    private Button worstCaseAnalysisButton;
+
+    @FXML
+    private TextArea resultTextArea;
+    
+	private PowerOutagesModel model;
+	private final String NO_RESULT_FOUND_ERROR = "There are no power outages matching this criteria!";
+
+    @FXML
+    void doWorstCaseAnalysis(ActionEvent event) 
+    {    	
+    	//TODO: implement method
+    	Nerc selectedNerc = this.NercComboBox.getValue();
+    	String maxHoursInput = this.maxHoursTextField.getText();
+    	String maxYearsInput = this.maxYearsTextField.getText();
+    	
+    	if(selectedNerc == null || maxHoursInput == null || maxYearsInput == null)
+    		throw new RuntimeException("Error in doWorstCaseAnalysis()");
+    	
+    	int maxHours, maxYears;
+    	try
+		{
+			maxYears = Integer.parseInt(maxYearsInput);
+			maxHours = Integer.parseInt(maxHoursInput);
+		}
+		catch(NumberFormatException nfe)
+		{
+			this.resultTextArea.setText("Error: wrong input format exception");
+			return;
+		}
+    	
+    	List<PowerOutage> powerOutages = this.model.computeWorstCase(selectedNerc, maxYears, maxHours);
+    	
+    	if(powerOutages.isEmpty())
+    	{
+    		this.resultTextArea.setText(NO_RESULT_FOUND_ERROR);
+    		return;
+    	}
+    	
+    	this.printPowerOutages(powerOutages);
     }
     
-    public void setModel(Model model) {
-    	this.model = model;
+    private String printPowerOutages(Collection<PowerOutage> powerOutages)
+    {
+    	StringBuilder sb = new StringBuilder();
+    	
+    	for(PowerOutage po : powerOutages)
+    	{
+    		if(sb.length() > 0)
+    			sb.append("\n");
+    		
+    		sb.append(po.toString());
+    	}
+    	return sb.toString();
+    }
+
+    @FXML
+    void handleMaxHoursTyped(KeyEvent event) 
+    {
+    	this.checkEmptyFields();
+    }
+
+    @FXML
+    void handleMaxYearsTyped(KeyEvent event) 
+    {
+    	this.checkEmptyFields();
+    }
+
+    @FXML
+    void handleNercSelected(ActionEvent event) 
+    {
+    	Nerc selectedNerc = this.NercComboBox.getValue();
+    	if(selectedNerc != null)
+    	{
+    		this.maxYearsTextField.setDisable(false);
+    		this.maxHoursTextField.setDisable(false);
+    	}
+    	else
+    	{
+    		this.maxYearsTextField.setDisable(true);
+    		this.maxHoursTextField.setDisable(true);
+    	}
+    	
+    	this.checkEmptyFields();
+    }
+    
+    private void checkEmptyFields()
+    {
+    	Nerc selectedNerc = this.NercComboBox.getValue();
+    	String maxYearsInput = this.maxYearsTextField.getText();
+    	String maxHoursInput = this.maxHoursTextField.getText();
+    	
+    	if(selectedNerc != null && !maxYearsInput.isBlank() && !maxHoursInput.isBlank())
+    		this.worstCaseAnalysisButton.setDisable(false);
+    	else
+    		this.worstCaseAnalysisButton.setDisable(true);
+    }
+
+    @FXML
+    void initialize() 
+    {
+        assert NercComboBox != null : "fx:id=\"NercComboBox\" was not injected: check your FXML file 'Scene_lab07.fxml'.";
+        assert maxYearsTextField != null : "fx:id=\"maxYearsTextField\" was not injected: check your FXML file 'Scene_lab07.fxml'.";
+        assert maxHoursTextField != null : "fx:id=\"maxHoursTextField\" was not injected: check your FXML file 'Scene_lab07.fxml'.";
+        assert worstCaseAnalysisButton != null : "fx:id=\"worstCaseAnalysisButton\" was not injected: check your FXML file 'Scene_lab07.fxml'.";
+        assert resultTextArea != null : "fx:id=\"resultTextArea\" was not injected: check your FXML file 'Scene_lab07.fxml'.";
+
+        // Utilizzare questo font per incolonnare correttamente i dati;
+        this.resultTextArea.setStyle("-fx-font-family: monospace");
+        
+        this.maxYearsTextField.setTextFormatter(new TextFormatter<>(change -> 
+        {
+        	if(this.maxYearsTextField.getText().length() >= 3)
+        		change.setText("");
+        	else
+        	{
+	        	String text = change.getText();
+	        	
+	        	if(text.length() > 3)
+	        		text = text.substring(0,3);
+	        	
+	        	if(text.matches("(.)*\\D(.)*"))
+	        		text = text.replaceAll("\\D", "");
+	        	
+	        	change.setText(text);
+        	}
+        	return change;
+        }));
+        
+        this.maxHoursTextField.setTextFormatter(new TextFormatter<>(change -> 
+        {
+        	if(this.maxHoursTextField.getText().length() >= 5)
+        		change.setText("");
+        	else
+        	{
+	        	String text = change.getText();
+	        	
+	        	if(text.length() > 5)
+	        		text = text.substring(0,5);
+	        	
+	        	if(text.matches("(.)*\\D(.)*"))
+	        		text = text.replaceAll("\\D", "");
+	        	
+	        	change.setText(text);
+        	}
+        	return change;
+        }));
+        
+    }
+    
+    public void setModel(PowerOutagesModel newModel) 
+    {
+    	this.model = newModel;
+    	this.NercComboBox.getItems().addAll(this.model.getAllNercs());
     }
 }
+
