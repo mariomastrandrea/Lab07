@@ -66,8 +66,10 @@ public class FXMLController
 			return;
 		}
     	
+    	long init = System.currentTimeMillis();
     	List<PowerOutage> worstCasePowerOutages = this.model.computeWorstCase(selectedNerc, maxYears, maxHours);
-    	
+    	long fin = System.currentTimeMillis();
+
     	if(worstCasePowerOutages.isEmpty())
     	{
     		this.resultTextArea.setText(NO_RESULT_FOUND_ERROR);
@@ -78,6 +80,7 @@ public class FXMLController
     	long totalHoursOfOutage = this.model.totHoursAffected(worstCasePowerOutages);
     	
     	StringBuilder output = new StringBuilder();
+    	output.append("time: ").append(fin-init).append("ms\n");
     	output.append("Total people affected: ").append(totPeopleAffected).append("\n");
     	output.append("Total hours of outage: ").append(totalHoursOfOutage).append("\n\n");
     	output.append(String.format("   %-5s %-5s %-20s %-20s %-4s %-4s %-8s\n",

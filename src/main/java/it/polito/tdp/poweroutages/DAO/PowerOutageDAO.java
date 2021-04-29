@@ -49,7 +49,7 @@ public class PowerOutageDAO
 								"SELECT id, nerc_id, customers_affected, date_event_began, date_event_finished",
 								"FROM PowerOutages",
 								"WHERE nerc_id = ?",
-								"ORDER BY date_event_began ASC");
+								"ORDER BY date_event_began ASC, date_event_finished ASC");
 		
 		List<PowerOutage> powerOutages = new ArrayList<>();
 		

@@ -16,7 +16,6 @@ public class PowerOutagesModel
 	private PowerOutageDAO powerOutageDao;
 	private Map<Nerc, List<PowerOutage>> powerOutagesByNerc;
 	
-	
 	public PowerOutagesModel() 
 	{
 		this.powerOutageDao = new PowerOutageDAO();
@@ -51,13 +50,13 @@ public class PowerOutagesModel
 		
 		return worstCase;
 	}
-	
+		
 	private void recursiveWorstCaseComputation(List<PowerOutage> partialSolution, List<PowerOutage> allPowerOutages,
 			int offset, List<PowerOutage> worstCase, Period maxPeriod, Duration maxHours)
-	{
+	{	
 		int size = allPowerOutages.size();
 		
-		if(offset >= size) 
+		if(offset == size) 
 		{
 			//examining last element: either partialSolution is a solution 
 			//						or partialSolution without this last element is a solution
@@ -100,6 +99,39 @@ public class PowerOutagesModel
 			partialSolution.remove(lastIndex);
 		}
 	}
+	
+	/*
+	//meno efficiente del primo
+	private void recursiveWorstCaseComputation2(List<PowerOutage> partialSolution, List<PowerOutage> allPowerOutages,
+			int offset, List<PowerOutage> worstCase, Period maxPeriod, Duration maxHours)
+	{
+		int size = allPowerOutages.size();
+		
+		for(int i=offset; i<size; i++)
+		{
+			PowerOutage po = allPowerOutages.get(i);
+			
+			partialSolution.add(po);
+			
+			if(respectCostrains(partialSolution, maxPeriod, maxHours) && 
+					totalCustomersAffected(partialSolution) > totalCustomersAffected(worstCase));
+			{
+				recursiveWorstCaseComputation2(partialSolution, allPowerOutages, i+1, worstCase, maxPeriod, maxHours);
+			}
+			//backtracking
+			int lastIndex = partialSolution.size() - 1;
+			partialSolution.remove(lastIndex);
+		}
+		
+		//after last loop
+		if(!partialSolution.isEmpty() && respectCostrains(partialSolution, maxPeriod, maxHours) &&
+				totalCustomersAffected(partialSolution) > totalCustomersAffected(worstCase))
+		{
+			worstCase.clear();
+			worstCase.addAll(partialSolution);
+		}
+	}
+	*/
 	
 	private boolean respectCostrains(List<PowerOutage> powerOutages, Period maxPeriod, Duration maxDuration)
 	{
