@@ -21,16 +21,16 @@ public class ConnectDB
 	
 	static 
 	{
-		HikariConfig config = new HikariConfig();
-		config.setJdbcUrl(jdbcURL);
-		config.setUsername(username);
-		config.setPassword(password);
-		
-		config.addDataSourceProperty("cachePrepStmts", true);
-		config.addDataSourceProperty("prepStmtChacheSize", 250);
-		config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-		
-		dataSource = new HikariDataSource(config);
+		HikariConfig configuration = new HikariConfig();
+		configuration.setJdbcUrl(jdbcURL);
+		configuration.setUsername(username);
+		configuration.setPassword(password);
+
+		configuration.addDataSourceProperty("cachePrepStmts", true);
+		configuration.addDataSourceProperty("prepStmtChacheSize", 250);
+		configuration.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+	
+		dataSource = new HikariDataSource(configuration);
 	}
 	
 	public static Connection getConnection() 
